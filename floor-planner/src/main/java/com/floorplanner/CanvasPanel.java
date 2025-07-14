@@ -134,24 +134,52 @@ public class CanvasPanel extends JPanel {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         
         // Draw grid
         drawGrid(g2d);
         
-        // Draw rooms
+        // Draw rooms with enhanced appearance
         for (Room room : rooms) {
-            room.draw(g2d);
+            // Draw room background with transparency
+            Color roomColor = room.getType().getColor();
+            g2d.setColor(new Color(roomColor.getRed(), roomColor.getGreen(), roomColor.getBlue(), 230));
+            g2d.fillRoundRect(room.getX(), room.getY(), room.getWidth(), room.getHeight(), 10, 10);
+
+            // Draw room border
+            g2d.setColor(new Color(100, 100, 100, 150));
+            g2d.setStroke(new BasicStroke(1.5f));
+            g2d.drawRoundRect(room.getX(), room.getY(), room.getWidth(), room.getHeight(), 10, 10);
+            
+            // Draw room label
+            String roomType = room.getType().toString();
+            g2d.setFont(new Font("Segoe UI", Font.BOLD, 14));
+            FontMetrics fm = g2d.getFontMetrics();
+            int textX = room.getX() + (room.getWidth() - fm.stringWidth(roomType)) / 2;
+            int textY = room.getY() + (room.getHeight() + fm.getAscent()) / 2;
+            
+            // Add text shadow
+            g2d.setColor(new Color(0, 0, 0, 50));
+            g2d.drawString(roomType, textX + 1, textY + 1);
+            
+            // Draw main text
+            g2d.setColor(new Color(51, 51, 51));
+            g2d.drawString(roomType, textX, textY);
         }
     }
     
     private void drawGrid(Graphics2D g2d) {
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Draw subtle grid
         g2d.setColor(new Color(230, 230, 230));
-        
-        for (int x = 0; x < getWidth(); x += GRID_SIZE) {
+        g2d.setStroke(new BasicStroke(1.0f));
+
+        for (int x = 0; x <= getWidth(); x += GRID_SIZE) {
             g2d.drawLine(x, 0, x, getHeight());
         }
-        
-        for (int y = 0; y < getHeight(); y += GRID_SIZE) {
+
+        for (int y = 0; y <= getHeight(); y += GRID_SIZE) {
             g2d.drawLine(0, y, getWidth(), y);
         }
     }

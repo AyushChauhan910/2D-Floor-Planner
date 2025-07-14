@@ -20,25 +20,7 @@ public class Room {
         this.bounds = new Rectangle2D.Double(x, y, width, height);
     }
     
-    public void draw(Graphics2D g2d) {
-        // Fill room with type-specific color
-        g2d.setColor(type.getColor());
-        g2d.fill(bounds);
-        
-        // Draw room border
-        g2d.setColor(Color.BLACK);
-        g2d.setStroke(new BasicStroke(2));
-        g2d.draw(bounds);
-        
-        // Draw room label
-        g2d.setColor(Color.BLACK);
-        g2d.setFont(new Font("Arial", Font.PLAIN, 12));
-        String label = type.toString();
-        FontMetrics fm = g2d.getFontMetrics();
-        int textX = x + (width - fm.stringWidth(label)) / 2;
-        int textY = y + (height + fm.getAscent()) / 2;
-        g2d.drawString(label, textX, textY);
-    }
+
     
     public boolean intersects(Room other) {
         return bounds.intersects(other.bounds);

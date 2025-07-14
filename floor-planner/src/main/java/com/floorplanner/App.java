@@ -35,8 +35,11 @@ public class App extends JFrame {
         // Control Panel
         controlPanel = new JPanel();
         controlPanel.setPreferredSize(new Dimension((int)(SCREEN_WIDTH * (1 - CANVAS_RATIO)), SCREEN_HEIGHT));
-        controlPanel.setBackground(new Color(240, 240, 240));
-        controlPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        controlPanel.setBackground(new Color(245, 245, 247));
+        controlPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 1, 0, 0, new Color(200, 200, 200)),
+            BorderFactory.createEmptyBorder(20, 25, 20, 25)
+        ));
         controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.Y_AXIS));
         
         // Add room controls
@@ -47,25 +50,38 @@ public class App extends JFrame {
         // Title
         JLabel titleLabel = new JLabel("Room Controls");
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        titleLabel.setForeground(new Color(51, 51, 51));
         controlPanel.add(titleLabel);
         controlPanel.add(Box.createVerticalStrut(20));
         
         // Room Type Selection
         String[] roomTypes = {"Bedroom", "Bathroom", "Kitchen", "Living Room", "Dining Room"};
         roomTypeCombo = new JComboBox<>(roomTypes);
-        roomTypeCombo.setMaximumSize(new Dimension(300, 30));
+        roomTypeCombo.setMaximumSize(new Dimension(300, 35));
+        roomTypeCombo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        ((JLabel)roomTypeCombo.getRenderer()).setPreferredSize(new Dimension(270, 25));
         roomTypeCombo.setAlignmentX(Component.CENTER_ALIGNMENT);
         controlPanel.add(roomTypeCombo);
         controlPanel.add(Box.createVerticalStrut(10));
         
         // Room Dimensions
         JPanel dimensionsPanel = new JPanel();
-        dimensionsPanel.setLayout(new FlowLayout());
-        dimensionsPanel.setMaximumSize(new Dimension(300, 35));
+        dimensionsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        dimensionsPanel.setMaximumSize(new Dimension(300, 40));
+        dimensionsPanel.setBackground(controlPanel.getBackground());
         
         widthField = new JTextField(5);
         heightField = new JTextField(5);
+        
+        // Style text fields
+        Font fieldFont = new Font("Segoe UI", Font.PLAIN, 14);
+        Dimension fieldSize = new Dimension(60, 30);
+        
+        widthField.setFont(fieldFont);
+        widthField.setPreferredSize(fieldSize);
+        heightField.setFont(fieldFont);
+        heightField.setPreferredSize(fieldSize);
         
         dimensionsPanel.add(new JLabel("Width (px):"));
         dimensionsPanel.add(widthField);
@@ -78,7 +94,13 @@ public class App extends JFrame {
         // Add Room Button
         JButton addRoomButton = new JButton("Add Room");
         addRoomButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        addRoomButton.setMaximumSize(new Dimension(150, 30));
+        addRoomButton.setMaximumSize(new Dimension(300, 40));
+        addRoomButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        addRoomButton.setBackground(new Color(70, 130, 180));
+        addRoomButton.setForeground(Color.WHITE);
+        addRoomButton.setFocusPainted(false);
+        addRoomButton.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+        addRoomButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         addRoomButton.addActionListener(e -> addRoom());
         controlPanel.add(addRoomButton);
         
@@ -99,8 +121,14 @@ public class App extends JFrame {
         instructions.setBackground(controlPanel.getBackground());
         instructions.setWrapStyleWord(true);
         instructions.setLineWrap(true);
+        instructions.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        instructions.setForeground(new Color(100, 100, 100));
         instructions.setMaximumSize(new Dimension(280, 200));
         instructions.setAlignmentX(Component.CENTER_ALIGNMENT);
+        instructions.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
+            BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        ));
         controlPanel.add(instructions);
     }
     

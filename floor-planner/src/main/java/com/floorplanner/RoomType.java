@@ -3,11 +3,11 @@ package com.floorplanner;
 import java.awt.Color;
 
 public enum RoomType {
-    BEDROOM(new Color(144, 238, 144), "Bedroom"),      // Light green
-    BATHROOM(new Color(135, 206, 235), "Bathroom"),    // Sky blue
-    KITCHEN(new Color(255, 182, 193), "Kitchen"),      // Light red/pink
-    LIVING_ROOM(new Color(255, 218, 185), "Living Room"), // Peach
-    DINING_ROOM(new Color(255, 222, 173), "Dining Room"); // Light orange
+    BEDROOM(new Color(142, 190, 238), "Bedroom"),       // Soft blue
+    BATHROOM(new Color(255, 183, 197), "Bathroom"),     // Soft pink
+    KITCHEN(new Color(152, 223, 175), "Kitchen"),       // Mint green
+    LIVING_ROOM(new Color(255, 206, 168), "Living Room"), // Warm peach
+    DINING_ROOM(new Color(216, 181, 232), "Dining Room"); // Soft purple
     
     private final Color color;
     private final String displayName;
