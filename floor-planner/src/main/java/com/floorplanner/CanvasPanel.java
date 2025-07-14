@@ -3,19 +3,24 @@ package com.floorplanner;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CanvasPanel extends JPanel {
     private static final long serialVersionUID = 1L;
     private List<Room> rooms;
+    private List<Furniture> furniture;
     private Room selectedRoom;
+    private Furniture selectedFurniture;
     private Point dragStart;
     private Point originalRoomPos;
+    private Point originalFurniturePos;
     private static final int GRID_SIZE = 20;
     
     public CanvasPanel() {
         rooms = new ArrayList<>();
+        furniture = new ArrayList<>();
         setBackground(Color.WHITE);
         setupMouseListeners();
     }
@@ -24,10 +29,16 @@ public class CanvasPanel extends JPanel {
         MouseAdapter mouseAdapter = new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                selectedRoom = findRoomAt(e.getPoint());
-                if (selectedRoom != null) {
+                selectedFurniture = findFurnitureAt(e.getPoint());
+                if (selectedFurniture != null) {
                     dragStart = e.getPoint();
-                    originalRoomPos = new Point(selectedRoom.getX(), selectedRoom.getY());
+                    originalFurniturePos = new Point(selectedFurniture.getX(), selectedFurniture.getY());
+                } else {
+                    selectedRoom = findRoomAt(e.getPoint());
+                    if (selectedRoom != null) {
+                        dragStart = e.getPoint();
+                        originalRoomPos = new Point(selectedRoom.getX(), selectedRoom.getY());
+                    }
                 }
             }
             
@@ -37,23 +48,27 @@ public class CanvasPanel extends JPanel {
                     int dx = e.getX() - dragStart.x;
                     int dy = e.getY() - dragStart.y;
                     
-                    // Snap to grid
                     int newX = snapToGrid(originalRoomPos.x + dx);
                     int newY = snapToGrid(originalRoomPos.y + dy);
                     
-                    // Store current position
                     int oldX = selectedRoom.getX();
                     int oldY = selectedRoom.getY();
                     
-                    // Try new position
                     selectedRoom.setPosition(newX, newY);
                     
-                    // Check for collisions
                     if (checkCollisions(selectedRoom)) {
-                        // Restore old position if collision detected
                         selectedRoom.setPosition(oldX, oldY);
                     }
                     
+                    repaint();
+                } else if (selectedFurniture != null && dragStart != null) {
+                    int dx = e.getX() - dragStart.x;
+                    int dy = e.getY() - dragStart.y;
+                    
+                    int newX = snapToGrid(originalFurniturePos.x + dx);
+                    int newY = snapToGrid(originalFurniturePos.y + dy);
+                    
+                    selectedFurniture.setPosition(newX, newY);
                     repaint();
                 }
             }
@@ -61,8 +76,18 @@ public class CanvasPanel extends JPanel {
             @Override
             public void mouseReleased(MouseEvent e) {
                 selectedRoom = null;
+                selectedFurniture = null;
                 dragStart = null;
                 originalRoomPos = null;
+                originalFurniturePos = null;
+            }
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2 && selectedFurniture != null) {
+                    selectedFurniture.rotate(90);
+                    repaint();
+                }
             }
         };
         
@@ -79,6 +104,15 @@ public class CanvasPanel extends JPanel {
         return null;
     }
     
+    private Furniture findFurnitureAt(Point p) {
+        for (Furniture item : furniture) {
+            if (item.getBounds().contains(p)) {
+                return item;
+            }
+        }
+        return null;
+    }
+    
     private boolean checkCollisions(Room room) {
         for (Room other : rooms) {
             if (other != room && room.intersects(other)) {
@@ -89,7 +123,6 @@ public class CanvasPanel extends JPanel {
     }
     
     public void addRoom(RoomType type, int width, int height) {
-        // Find position for new room using row-major order
         Point position = findNextAvailablePosition(width, height);
         Room newRoom = new Room(position.x, position.y, width, height, type);
         
@@ -102,6 +135,13 @@ public class CanvasPanel extends JPanel {
                 "Placement Error",
                 JOptionPane.ERROR_MESSAGE);
         }
+    }
+    
+    public void addFurniture(FurnitureType type) {
+        Point position = findNextAvailablePosition(type.getDefaultWidth(), type.getDefaultHeight());
+        Furniture newFurniture = new Furniture(position.x, position.y, type);
+        furniture.add(newFurniture);
+        repaint();
     }
     
     private Point findNextAvailablePosition(int width, int height) {
@@ -136,42 +176,98 @@ public class CanvasPanel extends JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         
-        // Draw grid
         drawGrid(g2d);
         
-        // Draw rooms with enhanced appearance
+        // Draw rooms
         for (Room room : rooms) {
-            // Draw room background with transparency
             Color roomColor = room.getType().getColor();
             g2d.setColor(new Color(roomColor.getRed(), roomColor.getGreen(), roomColor.getBlue(), 230));
             g2d.fillRoundRect(room.getX(), room.getY(), room.getWidth(), room.getHeight(), 10, 10);
 
-            // Draw room border
             g2d.setColor(new Color(100, 100, 100, 150));
             g2d.setStroke(new BasicStroke(1.5f));
             g2d.drawRoundRect(room.getX(), room.getY(), room.getWidth(), room.getHeight(), 10, 10);
             
-            // Draw room label
-            String roomType = room.getType().toString();
+            // Draw doors and windows for rooms
+            drawRoomFeatures(g2d, room);
+            
+            String roomType = room.getType().getDisplayName();
             g2d.setFont(new Font("Segoe UI", Font.BOLD, 14));
             FontMetrics fm = g2d.getFontMetrics();
             int textX = room.getX() + (room.getWidth() - fm.stringWidth(roomType)) / 2;
             int textY = room.getY() + (room.getHeight() + fm.getAscent()) / 2;
             
-            // Add text shadow
             g2d.setColor(new Color(0, 0, 0, 50));
             g2d.drawString(roomType, textX + 1, textY + 1);
             
-            // Draw main text
             g2d.setColor(new Color(51, 51, 51));
             g2d.drawString(roomType, textX, textY);
+        }
+        
+        // Draw furniture
+        for (Furniture item : furniture) {
+            AffineTransform oldTransform = g2d.getTransform();
+            
+            g2d.translate(item.getX() + item.getWidth()/2, item.getY() + item.getHeight()/2);
+            g2d.rotate(Math.toRadians(item.getRotation()));
+            g2d.translate(-item.getWidth()/2, -item.getHeight()/2);
+            
+            // Draw furniture icon based on type
+            drawFurnitureIcon(g2d, item);
+            
+            g2d.setTransform(oldTransform);
+        }
+    }
+    
+    private void drawRoomFeatures(Graphics2D g2d, Room room) {
+        // Add a door to each room
+        int doorWidth = 40;
+        int doorHeight = 10;
+        IconManager.drawDoor(g2d, room.getX() + room.getWidth()/2 - doorWidth/2,
+                               room.getY() + room.getHeight() - doorHeight,
+                               doorWidth, doorHeight);
+        
+        // Add windows based on room size
+        int windowWidth = 30;
+        int windowHeight = 10;
+        int spacing = room.getWidth() / 3;
+        
+        // Draw windows on the top wall
+        for (int x = room.getX() + spacing; x < room.getX() + room.getWidth() - windowWidth; x += spacing) {
+            IconManager.drawWindow(g2d, x, room.getY(), windowWidth, windowHeight);
+        }
+    }
+    
+    private void drawFurnitureIcon(Graphics2D g2d, Furniture item) {
+        switch (item.getType()) {
+            case BED:
+                IconManager.drawBed(g2d, 0, 0, item.getWidth(), item.getHeight(), item.getType().getColor());
+                break;
+            case SOFA:
+                IconManager.drawSofa(g2d, 0, 0, item.getWidth(), item.getHeight(), item.getType().getColor());
+                break;
+            case TABLE:
+                IconManager.drawTable(g2d, 0, 0, item.getWidth(), item.getHeight(), item.getType().getColor());
+                break;
+            case CHAIR:
+                IconManager.drawChair(g2d, 0, 0, item.getWidth(), item.getHeight(), item.getType().getColor());
+                break;
+            case WARDROBE:
+                IconManager.drawWardrobe(g2d, 0, 0, item.getWidth(), item.getHeight(), item.getType().getColor());
+                break;
+            case BOOKSHELF:
+                IconManager.drawBookshelf(g2d, 0, 0, item.getWidth(), item.getHeight(), item.getType().getColor());
+                break;
+            default:
+                // Fallback to basic rectangle for unknown types
+                g2d.setColor(item.getType().getColor());
+                g2d.fillRoundRect(0, 0, item.getWidth(), item.getHeight(), 5, 5);
+                break;
         }
     }
     
     private void drawGrid(Graphics2D g2d) {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        // Draw subtle grid
         g2d.setColor(new Color(230, 230, 230));
         g2d.setStroke(new BasicStroke(1.0f));
 

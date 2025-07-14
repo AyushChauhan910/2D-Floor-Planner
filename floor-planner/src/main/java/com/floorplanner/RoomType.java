@@ -21,6 +21,10 @@ public enum RoomType {
         return color;
     }
     
+    public String getDisplayName() {
+        return displayName;
+    }
+    
     @Override
     public String toString() {
         return displayName;

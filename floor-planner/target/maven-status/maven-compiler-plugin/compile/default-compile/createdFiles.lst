@@ -1,5 +1,9 @@
-com\floorplanner\App.class
 com\floorplanner\RoomType.class
-com\floorplanner\CanvasPanel.class
+com\floorplanner\CanvasPanel$2.class
+com\floorplanner\Furniture.class
 com\floorplanner\Room.class
+com\floorplanner\IconManager.class
+com\floorplanner\App.class
+com\floorplanner\CanvasPanel.class
 com\floorplanner\CanvasPanel$1.class
+com\floorplanner\FurnitureType.class
