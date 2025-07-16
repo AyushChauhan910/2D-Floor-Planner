@@ -33,18 +33,25 @@ public class Furniture {
     }
     
     public void rotate(double degrees) {
+        double oldRotation = this.rotation;
         this.rotation = (this.rotation + degrees) % 360;
         if (this.rotation < 0) {
             this.rotation += 360;
         }
-        
-        // Swap width and height if rotation is 90 or 270 degrees
-        if ((int)rotation % 180 == 90) {
+        int oldNum = (int) (oldRotation / 90) % 2;
+        int newNum = (int) (this.rotation / 90) % 2;
+        if (oldNum != newNum) {
+            double oldCenterX = x + width / 2.0;
+            double oldCenterY = y + height / 2.0;
             int temp = width;
             width = height;
             height = temp;
             bounds.width = width;
             bounds.height = height;
+            x = (int) Math.round(oldCenterX - width / 2.0);
+            y = (int) Math.round(oldCenterY - height / 2.0);
+            bounds.x = x;
+            bounds.y = y;
         }
     }
     
@@ -58,18 +65,25 @@ public class Furniture {
     public double getRotation() { return rotation; }
     
     public void setRotation(int degrees) {
+        double oldRotation = this.rotation;
         this.rotation = degrees % 360;
         if (this.rotation < 0) {
             this.rotation += 360;
         }
-        
-        // Swap width and height if rotation is 90 or 270 degrees
-        if ((int)rotation % 180 == 90) {
+        int oldNum = (int) (oldRotation / 90) % 2;
+        int newNum = (int) (this.rotation / 90) % 2;
+        if (oldNum != newNum) {
+            double oldCenterX = x + width / 2.0;
+            double oldCenterY = y + height / 2.0;
             int temp = width;
             width = height;
             height = temp;
             bounds.width = width;
             bounds.height = height;
+            x = (int) Math.round(oldCenterX - width / 2.0);
+            y = (int) Math.round(oldCenterY - height / 2.0);
+            bounds.x = x;
+            bounds.y = y;
         }
     }
     

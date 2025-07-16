@@ -34,7 +34,7 @@ public class CanvasPanel extends JPanel {
     private void setupMouseListeners() {
         MouseAdapter mouseAdapter = new MouseAdapter() {
             private boolean isResizing = false;
-            private int resizeHandle = -1; // 0: NW, 1: NE, 2: SE, 3: SW
+            private int resizeHandle = -1;
             private Point resizeStart;
             private int originalWidth;
             private int originalHeight;
@@ -71,6 +71,7 @@ public class CanvasPanel extends JPanel {
                         resizeStart = e.getPoint();
                         originalWidth = selectedFurniture.getWidth();
                         originalHeight = selectedFurniture.getHeight();
+                        originalFurniturePos = new Point(selectedFurniture.getX(), selectedFurniture.getY());
                     } else {
                         dragStart = e.getPoint();
                         originalFurniturePos = new Point(selectedFurniture.getX(), selectedFurniture.getY());
@@ -171,6 +172,15 @@ public class CanvasPanel extends JPanel {
             
             @Override
             public void mouseReleased(MouseEvent e) {
+                if (selectedFurniture != null) {
+                    if (checkFurnitureCollisions(selectedFurniture)) {
+                        selectedFurniture.setPosition(originalFurniturePos.x, originalFurniturePos.y);
+                        if (isResizing) {
+                            selectedFurniture.setSize(originalWidth, originalHeight);
+                        }
+                        repaint();
+                    }
+                }
                 selectedRoom = null;
                 selectedFurniture = null;
                 dragStart = null;
@@ -184,7 +194,11 @@ public class CanvasPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2 && selectedFurniture != null) {
+                    double oldRotation = selectedFurniture.getRotation();
                     selectedFurniture.rotate(90);
+                    if (checkFurnitureCollisions(selectedFurniture)) {
+                        selectedFurniture.setRotation((int) oldRotation);
+                    }
                     repaint();
                 }
             }
@@ -623,36 +637,42 @@ public class CanvasPanel extends JPanel {
         g2d.setStroke(new BasicStroke(1.5f));
         g2d.drawRect(0, 0, width, height);
         // Draw furniture icon based on type
-        g2d.setColor(new Color(80, 80, 80));
         switch (type) {
             case BED:
-                // Draw a bed icon
-                g2d.fillRect(width/10, height/4, width*8/10, height*6/10);
-                g2d.setColor(new Color(150, 150, 150));
-                g2d.fillRect(width/10, height/10, width*8/10, height/6);
+                g2d.setColor(new Color(139, 69, 19)); // SaddleBrown
+                g2d.fillRoundRect(0, height/4, width, height*3/4, 10, 10);
+                g2d.setColor(new Color(222, 184, 135)); // BurlyWood
+                g2d.fillRoundRect(0, height/4, width, height/4, 10, 10);
+                g2d.setColor(new Color(160, 82, 45)); // Sienna
+                g2d.drawRoundRect(0, height/4, width, height*3/4, 10, 10);
                 break;
             case SOFA:
-                // Draw a sofa icon
-                g2d.fillRect(width/10, height/4, width*8/10, height*6/10);
-                g2d.setColor(new Color(150, 150, 150));
-                g2d.fillRect(width/10, height/10, width*8/10, height/6);
-                g2d.fillRect(width/10, height*3/4, width*8/10, height/6);
+                g2d.setColor(new Color(70, 130, 180)); // SteelBlue
+                g2d.fillRoundRect(0, height/4, width, height*3/4, 15, 15);
+                g2d.setColor(new Color(100, 149, 237)); // CornflowerBlue
+                g2d.fillRect(0, height/4, width, height/6);
+                g2d.setColor(new Color(25, 25, 112)); // MidnightBlue
+                g2d.drawRoundRect(0, height/4, width, height*3/4, 15, 15);
                 break;
             case TABLE:
-                // Draw a table icon
-                g2d.fillRect(width/6, height/6, width*2/3, height*2/3);
+                g2d.setColor(new Color(205, 133, 63)); // Peru
+                g2d.fillOval(width/6, height/6, width*2/3, height*2/3);
+                g2d.setColor(new Color(139, 69, 19)); // SaddleBrown
+                g2d.drawOval(width/6, height/6, width*2/3, height*2/3);
                 break;
             case CHAIR:
-                // Draw a chair icon
+                g2d.setColor(new Color(160, 82, 45)); // Sienna
                 g2d.fillRect(width/4, height/4, width/2, height/2);
+                g2d.setColor(new Color(101, 67, 33)); // Dark Brown
+                g2d.drawRect(width/4, height/4, width/2, height/2);
                 g2d.drawLine(width/4, height*3/4, width/4, height*7/8);
                 g2d.drawLine(width*3/4, height*3/4, width*3/4, height*7/8);
                 g2d.drawLine(width/4, height/4, width/4, height/8);
                 g2d.drawLine(width*3/4, height/4, width*3/4, height/8);
                 break;
-           
+            
             default:
-                // Generic furniture icon
+                g2d.setColor(new Color(80, 80, 80));
                 g2d.drawLine(0, 0, width, height);
                 g2d.drawLine(0, height, width, 0);
         }
@@ -666,5 +686,13 @@ public class CanvasPanel extends JPanel {
         int textY = height - 5;
         g2d.drawString(label, textX, textY);
     }
+
+    private boolean checkFurnitureCollisions(Furniture furn) {
+        for (Furniture other : furniture) {
+            if (other != furn && furn.intersects(other.getBounds())) {
+                return true;
+            }
+        }
+        return false;
+    }
 } // End of CanvasPanel class
-// Remove any content after this line
