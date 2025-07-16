@@ -3,6 +3,7 @@ package com.floorplanner;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
+import java.io.*;
 
 public class App extends JFrame {
     private static final long serialVersionUID = 1L;
@@ -38,6 +39,16 @@ public class App extends JFrame {
         // Furniture Controls Section
         JPanel furnitureControls = createFurnitureControls();
         controlPanel.add(furnitureControls);
+        controlPanel.add(Box.createVerticalStrut(20));
+
+        // Relative Position Controls Section
+        JPanel relativePositionControls = createRelativePositionControls();
+        controlPanel.add(relativePositionControls);
+        controlPanel.add(Box.createVerticalStrut(20));
+
+        // Save/Load Controls Section
+        JPanel saveLoadControls = createSaveLoadControls();
+        controlPanel.add(saveLoadControls);
         controlPanel.add(Box.createVerticalStrut(20));
 
         // Instructions Section
@@ -204,5 +215,201 @@ public class App extends JFrame {
             App app = new App();
             app.setVisible(true);
         });
+    }
+
+    private JPanel createRelativePositionControls() {
+        JPanel panel = new JPanel(new GridLayout(1, 4));
+        
+        JButton northBtn = new JButton("North");
+        JButton southBtn = new JButton("South");
+        JButton eastBtn = new JButton("East");
+        JButton westBtn = new JButton("West");
+        
+        northBtn.addActionListener(e -> {
+            if (canvasPanel.getSelectedRoom() != null) {
+                // Show room type selection dialog
+                RoomType[] roomTypes = RoomType.values();
+                RoomType selectedType = (RoomType)JOptionPane.showInputDialog(
+                    this,
+                    "Select room type:",
+                    "Room Type",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    roomTypes,
+                    RoomType.LIVING_ROOM);
+                    
+                if (selectedType != null) {
+                    String widthStr = JOptionPane.showInputDialog(this, "Enter room width:", "200");
+                    String heightStr = JOptionPane.showInputDialog(this, "Enter room height:", "200");
+                    String offsetStr = JOptionPane.showInputDialog(this, "Enter offset from wall:", "0");
+                    
+                    try {
+                        int width = Integer.parseInt(widthStr);
+                        int height = Integer.parseInt(heightStr);
+                        int offset = Integer.parseInt(offsetStr);
+                        
+                        canvasPanel.addRoomRelative(canvasPanel.getSelectedRoom(), 
+                            selectedType, width, height, 
+                            CanvasPanel.RelativePosition.NORTH, offset);
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(this, "Invalid input. Please enter numbers only.", 
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+    
+        southBtn.addActionListener(e -> {
+            if (canvasPanel.getSelectedRoom() != null) {
+                RoomType[] roomTypes = RoomType.values();
+                RoomType selectedType = (RoomType)JOptionPane.showInputDialog(
+                    this,
+                    "Select room type:",
+                    "Room Type",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    roomTypes,
+                    RoomType.LIVING_ROOM);
+                    
+                if (selectedType != null) {
+                    String widthStr = JOptionPane.showInputDialog(this, "Enter room width:", "200");
+                    String heightStr = JOptionPane.showInputDialog(this, "Enter room height:", "200");
+                    String offsetStr = JOptionPane.showInputDialog(this, "Enter offset from wall:", "0");
+                    
+                    try {
+                        int width = Integer.parseInt(widthStr);
+                        int height = Integer.parseInt(heightStr);
+                        int offset = Integer.parseInt(offsetStr);
+                        
+                        canvasPanel.addRoomRelative(canvasPanel.getSelectedRoom(), 
+                            selectedType, width, height, 
+                            CanvasPanel.RelativePosition.SOUTH, offset);
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(this, "Invalid input. Please enter numbers only.", 
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+    
+        eastBtn.addActionListener(e -> {
+            if (canvasPanel.getSelectedRoom() != null) {
+                RoomType[] roomTypes = RoomType.values();
+                RoomType selectedType = (RoomType)JOptionPane.showInputDialog(
+                    this,
+                    "Select room type:",
+                    "Room Type",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    roomTypes,
+                    RoomType.LIVING_ROOM);
+                    
+                if (selectedType != null) {
+                    String widthStr = JOptionPane.showInputDialog(this, "Enter room width:", "200");
+                    String heightStr = JOptionPane.showInputDialog(this, "Enter room height:", "200");
+                    String offsetStr = JOptionPane.showInputDialog(this, "Enter offset from wall:", "0");
+                    
+                    try {
+                        int width = Integer.parseInt(widthStr);
+                        int height = Integer.parseInt(heightStr);
+                        int offset = Integer.parseInt(offsetStr);
+                        
+                        canvasPanel.addRoomRelative(canvasPanel.getSelectedRoom(), 
+                            selectedType, width, height, 
+                            CanvasPanel.RelativePosition.EAST, offset);
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(this, "Invalid input. Please enter numbers only.", 
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+    
+        westBtn.addActionListener(e -> {
+            if (canvasPanel.getSelectedRoom() != null) {
+                RoomType[] roomTypes = RoomType.values();
+                RoomType selectedType = (RoomType)JOptionPane.showInputDialog(
+                    this,
+                    "Select room type:",
+                    "Room Type",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    roomTypes,
+                    RoomType.LIVING_ROOM);
+                    
+                if (selectedType != null) {
+                    String widthStr = JOptionPane.showInputDialog(this, "Enter room width:", "200");
+                    String heightStr = JOptionPane.showInputDialog(this, "Enter room height:", "200");
+                    String offsetStr = JOptionPane.showInputDialog(this, "Enter offset from wall:", "0");
+                    
+                    try {
+                        int width = Integer.parseInt(widthStr);
+                        int height = Integer.parseInt(heightStr);
+                        int offset = Integer.parseInt(offsetStr);
+                        
+                        canvasPanel.addRoomRelative(canvasPanel.getSelectedRoom(), 
+                            selectedType, width, height, 
+                            CanvasPanel.RelativePosition.WEST, offset);
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(this, "Invalid input. Please enter numbers only.", 
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+    
+        panel.add(northBtn);
+        panel.add(southBtn);
+        panel.add(eastBtn);
+        panel.add(westBtn);
+        
+        return panel;
+    }
+
+    private JPanel createSaveLoadControls() {
+        JPanel panel = new JPanel(new GridLayout(1, 2));
+        
+        JButton saveBtn = new JButton("Save Plan");
+        JButton loadBtn = new JButton("Load Plan");
+        
+        saveBtn.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Save Floor Plan");
+            
+            if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                try (PrintWriter writer = new PrintWriter(file)) {
+                    writer.write(canvasPanel.savePlan());
+                    JOptionPane.showMessageDialog(this, "Plan saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(this, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+    
+        loadBtn.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Load Floor Plan");
+            
+            if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                    StringBuilder content = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        content.append(line).append("\n");
+                    }
+                    canvasPanel.loadPlan(content.toString());
+                    JOptionPane.showMessageDialog(this, "Plan loaded successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(this, "Error loading file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        
+        panel.add(saveBtn);
+        panel.add(loadBtn);
+        
+        return panel;
     }
 }

@@ -56,4 +56,27 @@ public class Furniture {
     public FurnitureType getType() { return type; }
     public Rectangle2D.Double getBounds() { return bounds; }
     public double getRotation() { return rotation; }
+    
+    public void setRotation(int degrees) {
+        this.rotation = degrees % 360;
+        if (this.rotation < 0) {
+            this.rotation += 360;
+        }
+        
+        // Swap width and height if rotation is 90 or 270 degrees
+        if ((int)rotation % 180 == 90) {
+            int temp = width;
+            width = height;
+            height = temp;
+            bounds.width = width;
+            bounds.height = height;
+        }
+    }
+    
+    public void setSize(int width, int height) {
+        this.width = width;
+        this.height = height;
+        this.bounds.width = width;
+        this.bounds.height = height;
+    }
 }
